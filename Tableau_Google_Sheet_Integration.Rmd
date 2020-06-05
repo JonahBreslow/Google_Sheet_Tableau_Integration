@@ -6,6 +6,8 @@ date: "`r format(Sys.time(), '%B %d %Y')`"
 output:
   html_document:
     df_print: paged
+    toc: true
+    toc_depth: 3
   pdf_document: default
   word_document: default
 subtitle: Using python to integrate Google Sheets and Tableau
@@ -117,11 +119,11 @@ You can then schedule your python script to run at intervals or at specific time
 Additionally, hosting your python script on the cloud (like AWS or Google Cloud) provides security, redundancy, and scalability that may be useful.
 
 
-### Use Cases
+## Use Cases
 By implementing the solution above, you now have the power to use Google Sheets as a *de facto* data lake. By intelligently structuring the data in the Google Sheets you can create a free, albeit small-scale, SQL database alternative. This provides many methods to source and ETL data using python (like BeautifulSoup for web scraping and Pandas for data wrangling/cleaning) and then create automatic data reloads to Tableau. 
 
-#### Disclaimer
+### Disclaimer
 Note, it is not *exactly* a SQL alternative because it does not provide the same keying and datatype capabilities. Additionally, you are subject to Google Sheet size constraints (https://support.google.com/drive/answer/37603). This is *not* intended to be a solution for archiving large amounts of data; this is intended to provide a small-scale database solution to automate Tableau.
 
-### Possible Improvements
+## Possible Improvements
 One drawback of this approach is that it requires a Google Chrome GUI to be controlled by the Selenium bot. This precludes using server-less cloud hosting tools like AWS Lambda. Instead, one would need to deploy an EC2 instance, which is both more time-intensive and expensive. One avenue that needs to be addressed is possibly making the Selenium bot run on a "headless" browser, effectively removing the requirement of using the Google Chrome GUI, therefore making AWS Lambda a workable option for cloud hosting.
