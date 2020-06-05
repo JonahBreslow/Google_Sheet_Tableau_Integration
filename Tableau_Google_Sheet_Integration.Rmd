@@ -1,5 +1,6 @@
 ---
 title: "| Creating An Automated Tableau \n| Refresh Schedule\n"
+author: Jonah Breslow, Consultant
 geometry: left=1cm,right=1cm,top=1cm,bottom=1.8cm,paperheight=11in,paperwidth=8.5in
 date: "`r format(Sys.time(), '%B %d %Y')`"
 output:
@@ -7,7 +8,7 @@ output:
     df_print: paged
   pdf_document: default
   word_document: default
-subtitle: Using python to integrate google sheets and Tableau
+subtitle: Using python to integrate Google Sheets and Tableau
 ---
 
 
@@ -18,7 +19,7 @@ htmltools::img(src = knitr::image_uri(file.path('Analytica Logo.jpg')),
 ```
 
 ## Purpose
-The purpose of this document is to develop a pipeline to automatically refresh a Tableau Public document more than once every 24 hours. Using this methodology, you can refresh Tableau at whatever schedule is required. This is important because Tableau Public currently updates the Google Sheet connection to a dashboard only once per day, which is severly limiting for time-sensitive analytics.
+The purpose of this document is to develop a pipeline to automatically refresh a Tableau Public document more than once every 24 hours. Using this methodology, you can refresh Tableau at whatever schedule is required. This is important because Tableau Public currently updates the Google Sheet connection to a dashboard only once per day, which is severely limiting for time-sensitive analytics.
 
 ## Pipeline Overview:
 There are essentially three main steps to implementing this solution:
@@ -30,7 +31,7 @@ There are essentially three main steps to implementing this solution:
 
 ## Pipeline Steps:
 ### Step 1: Configure gspread API in python
-Create a google sheet, or multiple google sheets if required, that will contain the data to be presented in the Tableau Public dashboard. Make sure that these Google Sheets are connected to the Tableau Dashboard. Then, follow the instructions in this youtube video to setup the gspread API, which will allow you modify the google sheet using python:
+Create a Google Sheet, or multiple Google Sheets if required, that will contain the data to be presented in the Tableau Public dashboard. Make sure that these Google Sheets are connected to the Tableau Dashboard. Then, follow the instructions in this YouTube video to setup the gspread API, which will allow you modify the Google Sheet using python:
 https://www.youtube.com/watch?v=vISRn5qFrkM.
 
 I will highlight the steps in the video here. There are some important modifications, so it is recommended to follow the steps below.
@@ -55,24 +56,24 @@ I will highlight the steps in the video here. There are some important modificat
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('[[YOUR JSON KEY FILE HERE]]',scope)
+scope = ['https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('Test-9176086fefeb.json',scope)
 client = gspread.authorize(creds)
 
-sheet = client.open('[[YOUR GOOGLE SHEET NAME HERE]]').sheet1
+sheet = client.open('Test').sheet1
 
 records = sheet.get_all_records()
 print(records)
 ```
 8. Now, run this python script from your terminal. You may need to install gspread and oauth2client first using **pip install**, **pip2 install**, or **pip3 install**, depending on your python version. Additionally, if you receive an error message, it will contain a URL. Copy that URL and paste it in your browser. This will give the service account you created access to the Google Sheets API, as well as the Google Drive API you already set up. Then, run the python script again and it should print out whatever you have in the Google Sheet. 
-9. Now you are connected and ready to manipulate google sheets with python. Please read the following documentation for methods and functions you can use in the gspread API: https://gspread.readthedocs.io/en/latest/.
-You can add rows, update cells, delete cells, and interact with google sheets how you normally would, but through a python script.
+9. Now you are connected and ready to manipulate Google Sheets with python. Please read the following documentation for methods and functions you can use in the gspread API: https://gspread.readthedocs.io/en/latest/.
+You can add rows, update cells, delete cells, and interact with Google Sheets how you normally would, but through a python script.
 
 ### Step 2: Setting up Selenium
 1. Install Chromedriver here: https://chromedriver.chromium.org/downloads. Choose the correct download for the version of chrome you are running.
 2. Move the chromedriver out of your downloads folder and into your project directory.
 3. In the terminal, install selenium. I used ***pip3 install selenium***, but you may have to install it a different way depending on what version of python you are running.
-4. *Copy and paste the following code into your python script*. This script opens up chrome, logs into tableau, opens up the correct dashboard, scrolls to the bottom and refreshes the google sheet connection, and then refreshes the page. You will need to fill in your Tableau Public username and password. Additionally, you will need to link to the correct URL where the tableau workbook is that is connected to your google sheet. You might need to change the xpaths and IDs to those that are relevant to your dashboard. There are plenty of tutorials on how to use selenium. 
+4. *Copy and paste the following code into your python script*. This script opens up chrome, logs into tableau, opens up the correct dashboard, scrolls to the bottom and refreshes the Google Sheet connection, and then refreshes the page. You will need to fill in your Tableau Public username and password. Additionally, you will need to link to the correct URL where the tableau workbook is that is connected to your Google Sheet. You might need to change the xpaths and IDs to those that are relevant to your dashboard. There are plenty of tutorials on how to use selenium. 
 ```{python eval=FALSE, include=TRUE, python.reticulate=FALSE}
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--no-sandbox')
@@ -114,3 +115,13 @@ driver.quit()
 You can then schedule your python script to run at intervals or at specific time using native tools, like Microsoft Task Scheduler or Apple Automator, but these options are relatively weighty to implement. Instead, I opted to use a python package called schedule. Documentation found here: https://pypi.org/project/schedule/. 
 
 Additionally, hosting your python script on the cloud (like AWS or Google Cloud) provides security, redundancy, and scalability that may be useful.
+
+
+### Use Cases
+By implementing the solution above, you now have the power to use Google Sheets as a *de facto* data lake. By intelligently structuring the data in the Google Sheets you can create a free, albeit small-scale, SQL database alternative. This provides many methods to source and ETL data using python (like BeautifulSoup for web scraping and Pandas for data wrangling/cleaning) and then create automatic data reloads to Tableau. 
+
+#### Disclaimer
+Note, it is not *exactly* a SQL alternative because it does not provide the same keying and datatype capabilities. Additionally, you are subject to Google Sheet size constraints (https://support.google.com/drive/answer/37603). This is *not* intended to be a solution for archiving large amounts of data; this is intended to provide a small-scale database solution to automate Tableau.
+
+### Possible Improvements
+One drawback of this approach is that it requires a Google Chrome GUI to be controlled by the Selenium bot. This precludes using server-less cloud hosting tools like AWS Lambda. Instead, one would need to deploy an EC2 instance, which is both more time-intensive and expensive. One avenue that needs to be addressed is possibly making the Selenium bot run on a "headless" browser, effectively removing the requirement of using the Google Chrome GUI, therefore making AWS Lambda a workable option for cloud hosting.
