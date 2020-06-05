@@ -18,9 +18,9 @@ htmltools::img(src = knitr::image_uri(file.path('Analytica Logo.jpg')),
 ```
 
 ## Purpose
-The purpose of this document is to describe a pipeline to automatically refresh a Tableau Public document more than once every 24 hours, at whatever schedule is required, using python. This is important because currently Tableau Public updates Google Sheet connections only oncer per day.
+The purpose of this document is to develop a pipeline to automatically refresh a Tableau Public document more than once every 24 hours. Using this methodology, you can refresh Tableau at whatever schedule is required. This is important because Tableau Public currently updates the Google Sheet connection to a dashboard only once per day, which is severly limiting for time-sensitive analytics.
 
-## Process Overview:
+## Pipeline Overview:
 There are essentially three main steps to implementing this solution:
 
 1. Connect the Tableau dashboard to Google Sheets, which will be controlled using the gpsread API in python.
@@ -28,7 +28,7 @@ There are essentially three main steps to implementing this solution:
 3. Schedule the python script to run at whatever time or interval is required.
 
 
-## Process Steps:
+## Pipeline Steps:
 ### Step 1: Configure gspread API in python
 Create a google sheet, or multiple google sheets if required, that will contain the data to be presented in the Tableau Public dashboard. Make sure that these Google Sheets are connected to the Tableau Dashboard. Then, follow the instructions in this youtube video to setup the gspread API, which will allow you modify the google sheet using python:
 https://www.youtube.com/watch?v=vISRn5qFrkM.
